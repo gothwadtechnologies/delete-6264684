@@ -1,5 +1,5 @@
 {
-  "name": "gothwad-technologies-pvt.-ltd.",
+  "name": "classes-x---educational-management-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "firebase": "^11.0.0",
+    "@google/genai": "1.4.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
