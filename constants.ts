@@ -6,12 +6,9 @@ export const SPLASH_DURATION = 3000;
 export const THEME = {
   primary: '#2563eb', // Blue 600
   secondary: '#f8fafc',
-  accent: '#ef4444',
+  accent: '#e11d48', // Red
   text: '#1e293b',
   textLight: '#64748b'
 };
 
-export const MOCK_ADMIN_CREDENTIALS = {
-  identifier: 'admin',
-  password: 'password123'
-};
+export const BOOK_ICON = "📖"; // Changed to Open Book as requested
