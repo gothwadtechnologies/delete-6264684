@@ -1,5 +1,7 @@
 {
-  "name": "CLASSES X - Educational Management App",
-  "description": "A comprehensive educational management system for Students, Parents, and Admins, featuring class schedules, fee tracking, tests, and attendance.",
-  "requestFramePermissions": []
+  "name": "Gothwad Technologies Pvt. Ltd.",
+  "description": "A premium enterprise-grade landing page for Gothwad Technologies, featuring a clean white theme, app store showcase, and detailed company roadmap.",
+  "requestFramePermissions": [
+    "camera"
+  ]
 }
