@@ -120,44 +120,43 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user, settings, onBack, o
   };
 
   return (
-    <div className="flex-1 bg-gray-50 flex flex-col h-full overflow-hidden">
-      {/* Refined Navigation Header */}
+    <div className="flex-1 flex flex-col h-full overflow-hidden" style={{ backgroundColor: settings.backgroundColor }}>
+      {/* Header */}
       <div className="bg-white px-4 py-4 border-b border-gray-100 flex items-center justify-between shrink-0 shadow-sm">
         <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-xl transition-all">
           <svg className="w-5 h-5 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Profile HQ</h2>
+        <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400">Security Vault</h2>
         <div className="w-10"></div>
       </div>
 
       <div className="flex-1 overflow-y-auto scroll-hide p-4 space-y-6 pb-24">
         {message && (
-          <div className={`p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border shadow-lg animate-in fade-in slide-in-from-top-2 ${
+          <div className={`p-4 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-lg animate-in fade-in slide-in-from-top-2 z-50 ${
             message.type === 'success' ? 'bg-green-600 text-white border-green-700' : 'bg-red-600 text-white border-red-700'
           }`}>
             {message.type === 'success' ? '✓' : '✕'} {message.text}
           </div>
         )}
 
-        {/* Profile Card - Compact */}
+        {/* Profile Avatar */}
         <div className="flex flex-col items-center">
           <div className="w-20 h-20 rounded-2xl bg-gray-900 flex items-center justify-center text-white text-4xl font-black shadow-xl mb-3 border-2 border-white">
             {user.name.charAt(0)}
           </div>
           <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight leading-none">{user.name}</h3>
           <p className="text-[9px] font-bold text-blue-600 uppercase tracking-widest mt-1 px-3 py-1 bg-blue-50 rounded-full border border-blue-100">
-            {user.role} Verified
+            {user.role} Status
           </p>
         </div>
 
-        {/* Identity Section - Matching other tabs */}
+        {/* Identity Card */}
         <div className="space-y-3">
-          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Account Info</p>
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Account Credentials</p>
           <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-5">
             
-            {/* Name Input */}
             <div className="space-y-1.5">
               <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Display Name</label>
               <div className="flex gap-2">
@@ -176,9 +175,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user, settings, onBack, o
               </div>
             </div>
 
-            {/* Email Change */}
             <div className="space-y-1.5 pt-4 border-t border-gray-50">
-              <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Email Protocol</label>
+              <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest px-1">Email Recovery</label>
               {emailStep === 1 ? (
                 <div className="flex gap-2 animate-in fade-in">
                   <input 
@@ -220,9 +218,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user, settings, onBack, o
           </div>
         </div>
 
-        {/* Security Section */}
+        {/* Password Card */}
         <div className="space-y-3">
-          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Privacy Vault</p>
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Privacy Layer</p>
           <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-3">
             <div className="relative">
               <input 
@@ -254,7 +252,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user, settings, onBack, o
                 <input 
                   type={showPass.confirm ? "text" : "password"}
                   className="w-full bg-gray-50 border border-gray-100 p-3.5 rounded-xl font-bold text-sm text-gray-900 outline-none"
-                  placeholder="Repeat"
+                  placeholder="Confirm"
                   value={confirmPass}
                   onChange={e => setConfirmPass(e.target.value)}
                 />
@@ -267,22 +265,22 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user, settings, onBack, o
             <button 
               onClick={handleUpdatePassword}
               disabled={loading === 'password'}
-              className="w-full bg-gray-900 text-white py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all mt-1"
+              className="w-full bg-gray-900 text-white py-4 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all mt-1"
             >
-              {loading === 'password' ? 'Updating...' : 'Secure Account'}
+              {loading === 'password' ? 'Updating...' : 'Change Password'}
             </button>
           </div>
         </div>
 
-        {/* Admin Tools - Integrated UI */}
+        {/* Admin Section */}
         {user.role === UserRole.ADMIN && (
           <div className="space-y-3">
-            <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest ml-1">Admin Control</p>
+            <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest ml-1">Admin Tools</p>
             <div className="grid grid-cols-1 gap-2">
               <button 
                 onClick={handleToggleMaintenance}
                 className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${
-                  settings.underMaintenance ? 'bg-amber-500 border-amber-600 text-white' : 'bg-white border-gray-100'
+                  settings.underMaintenance ? 'bg-amber-500 border-amber-600 text-white' : 'bg-white border-gray-100 shadow-sm'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -290,7 +288,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user, settings, onBack, o
                   <div className="text-left">
                     <h5 className="text-[10px] font-black uppercase">Maintenance</h5>
                     <p className={`text-[8px] font-bold uppercase ${settings.underMaintenance ? 'text-white/60' : 'text-gray-400'}`}>
-                      {settings.underMaintenance ? 'Restricted Mode' : 'Live Mode'}
+                      {settings.underMaintenance ? 'Offline' : 'Online'}
                     </p>
                   </div>
                 </div>
@@ -306,8 +304,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user, settings, onBack, o
                 <div className="flex items-center gap-3">
                   <span className="text-xl">💾</span>
                   <div className="text-left">
-                    <h5 className="text-[10px] font-black uppercase">Export Data</h5>
-                    <p className="text-[8px] text-white/60 font-bold uppercase">JSON Registry Backup</p>
+                    <h5 className="text-[10px] font-black uppercase">Export Backup</h5>
+                    <p className="text-[8px] text-white/60 font-bold uppercase tracking-widest">Firestore Dump</p>
                   </div>
                 </div>
                 <span className="text-xs opacity-40">📊</span>
