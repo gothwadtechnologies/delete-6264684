@@ -22,7 +22,13 @@ export interface GlobalSettings {
   underMaintenance?: boolean;
 }
 
-export type ClassLevel = '9th' | '10th' | '11th' | '12th' | 'Dropper';
+export enum ClassLevel {
+  NINTH = '9th',
+  TENTH = '10th',
+  ELEVENTH = '11th',
+  TWELFTH = '12th',
+  DROPPER = 'Dropper'
+}
 
 export interface Batch {
   id: string;

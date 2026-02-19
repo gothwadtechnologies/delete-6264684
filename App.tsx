@@ -12,7 +12,10 @@ import MainTabNavigator from './navigation/MainTabNavigator.tsx';
 import DrawerMenu from './components/DrawerMenu.tsx';
 import { auth, db, isFirebaseAvailable } from './firebase.ts';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, collection, query, orderBy, onSnapshot as onBatchesSnapshot } from 'firebase/firestore';
+import GlobalAddStudentScreen from './screens/GlobalAddStudentScreen.tsx';
+import UniversalSearchScreen from './screens/UniversalSearchScreen.tsx';
+import CreateBatchScreen from './screens/CreateBatchScreen.tsx';
 
 const FIXED_SETTINGS: GlobalSettings = {
   appName: "CLASSES X",
@@ -32,6 +35,11 @@ export default function App() {
   const [isDemoMode, setIsDemoMode] = useState(!isFirebaseAvailable);
   const [activeResource, setActiveResource] = useState<string | null>(null);
   const [settingsSubView, setSettingsSubView] = useState<'MAIN' | 'ABOUT' | 'AI' | 'PRIVACY'>('MAIN');
+  const [isAddStudentScreenVisible, setIsAddStudentScreenVisible] = useState(false);
+  const [isCreateBatchScreenVisible, setIsCreateBatchScreenVisible] = useState(false);
+  const [isSearchScreenVisible, setIsSearchScreenVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [allBatches, setAllBatches] = useState<Batch[]>([]);
 
   useEffect(() => {
     if (!isFirebaseAvailable) {
@@ -52,6 +60,12 @@ export default function App() {
             underMaintenance: !!data.underMaintenance
           });
         }
+      });
+
+      const batchesQuery = query(collection(db, 'batches'), orderBy('createdAt', 'desc'));
+      onBatchesSnapshot(batchesQuery, (snapshot) => {
+        const fetchedBatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Batch[];
+        setAllBatches(fetchedBatches);
       });
     }
 
@@ -116,7 +130,7 @@ export default function App() {
     setIsDrawerOpen(false);
     setActiveResource(null);
   };
-
+  
   if (currentScreen === 'MAINTENANCE') {
     return (
       <div className="mobile-container bg-white flex flex-col items-center justify-center p-8 text-center">
@@ -144,11 +158,14 @@ export default function App() {
             forcedResource={activeResource} 
             onOpenDrawer={() => setIsDrawerOpen(true)} 
             onSelectBatch={(b) => { setSelectedBatch(b); setCurrentScreen('BATCH_DETAILS'); }} 
-            onOpenNotifications={() => setCurrentScreen('NOTIFICATIONS')} 
+            onOpenNotifications={() => setCurrentScreen('NOTIFICATIONS')}
             onOpenProfile={() => setCurrentScreen('PROFILE')} 
             onLogout={handleLogout}
             onTabPress={() => setActiveResource(null)}
             onSelectResource={(id) => setActiveResource(id)}
+            onAddStudent={() => setIsAddStudentScreenVisible(true)}
+            onAddBatch={() => setIsCreateBatchScreenVisible(true)}
+            onSearch={() => setIsSearchScreenVisible(true)}
           />
           <DrawerMenu 
             isOpen={isDrawerOpen} 
@@ -166,13 +183,44 @@ export default function App() {
               setIsDrawerOpen(false);
             }}
           />
-        </>
+        </> 
       )}
 
       {currentScreen === 'SETTINGS' && user && <SettingsScreen settings={settings} user={user} onBack={() => { setCurrentScreen('HOME'); setSettingsSubView('MAIN'); }} initialSubView={settingsSubView} />}
       {currentScreen === 'BATCH_DETAILS' && user && selectedBatch && <BatchDetailsScreen batch={selectedBatch} settings={settings} user={user} onBack={() => setCurrentScreen('HOME')} />}
       {currentScreen === 'NOTIFICATIONS' && user && <NotificationsScreen user={user} settings={settings} onBack={() => setCurrentScreen('HOME')} />}
       {currentScreen === 'PROFILE' && user && <ProfileScreen user={user} settings={settings} onBack={() => setCurrentScreen('HOME')} onUpdateUser={(upd) => setUser({...user, ...upd})} />}
+      
+      {isAddStudentScreenVisible && (
+        <GlobalAddStudentScreen 
+          allBatches={allBatches}
+          onClose={() => setIsAddStudentScreenVisible(false)}
+        />
+      )}
+
+      {isSearchScreenVisible && (
+        <UniversalSearchScreen 
+          searchQuery={searchQuery}
+          onClose={() => setIsSearchScreenVisible(false)}
+          onSelectBatch={(batch) => {
+            setSelectedBatch(batch);
+            setCurrentScreen('BATCH_DETAILS');
+            setIsSearchScreenVisible(false);
+          }}
+          onSelectStudent={(student) => {
+            // You might want to navigate to a student details screen here
+            console.log("Selected student:", student);
+            setIsSearchScreenVisible(false);
+          }}
+        />
+      )}
+
+      {isCreateBatchScreenVisible && user && (
+        <CreateBatchScreen 
+          userId={user.uid}
+          onClose={() => setIsCreateBatchScreenVisible(false)}
+        />
+      )}
     </div>
   );
 }
