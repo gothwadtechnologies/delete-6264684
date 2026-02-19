@@ -37,4 +37,4 @@ const DeleteConfirmationScreen: React.FC<DeleteConfirmationScreenProps> = ({ ite
   );
 };
 
-export default DeleteConfirmationScreen;
+eexport default ConfirmDeleteModal;
