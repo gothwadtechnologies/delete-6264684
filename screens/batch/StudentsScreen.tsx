@@ -4,7 +4,8 @@ import { Batch, User } from '@/types';
 import { db } from '@/firebase';
 import { collection, doc, onSnapshot, query, where, getDocs, updateDoc, arrayRemove } from 'firebase/firestore';
 import EditStudentScreen from '@/screens/batch/EditStudentScreen';
-import ConfirmDeleteModal from '@/src/components/ConfirmDeleteModal';
+import DeleteConfirmationScreen from '../../components/DeleteConfirmationScreen';
+
 
 interface StudentsScreenProps {
   batch: Batch;
