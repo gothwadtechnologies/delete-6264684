@@ -169,18 +169,21 @@ const TestsScreen: React.FC<TestsScreenProps> = ({ user }) => {
   }
 
   return (
-    <div className="p-4 space-y-5">
-      <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-black text-gray-900 tracking-tight">Academic Portal</h3>
-          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Tests & Assessments</p>
+    <div className="p-4 space-y-4">
+        <div className="flex items-center justify-between mb-4">
+            <div>
+                <h2 className="text-xl font-bold text-gray-800">Available Tests</h2>
+                <p className="text-sm text-gray-500">Your scheduled tests are listed below</p>
+            </div>
+            {isAdmin && (
+                <button 
+                    onClick={() => setView('CREATE')} 
+                    className="bg-blue-600 text-white rounded-xl w-10 h-10 flex items-center justify-center shadow-lg shadow-blue-200/50 active:scale-95 transition-all"
+                >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v12m6-6H6" /></svg>
+                </button>
+            )}
         </div>
-        {isAdmin && (
-          <button onClick={() => setView('CREATE')} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-md active:scale-95 transition-all">
-            + New Test
-          </button>
-        )}
-      </div>
 
       <div className="space-y-4">
         {tests.length === 0 ? (

@@ -1,24 +1,59 @@
 
-import React, { useState } from 'react';
-import { User, ClassSession } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { User, ClassSession, UserRole } from '../../types';
+import { db } from '../../firebase';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 
-const MOCK_CLASSES: ClassSession[] = [
-  { id: '1', title: 'Mathematics - Trigonometry 101', instructor: 'Dr. Smith', time: 'LIVE - 10:00 AM', youtubeUrl: '#', type: 'live', modality: 'online' },
-  { id: '2', title: 'Physics - Newton Laws', instructor: 'Prof. J. Doe', time: 'REPLAY', youtubeUrl: '#', type: 'recorded', modality: 'online' },
-  { id: '3', title: 'Chemistry - Organic Bonds', instructor: 'Ms. Sarah', time: 'Upcoming - 2:00 PM', youtubeUrl: '#', type: 'live', modality: 'online' },
-  { id: '4', title: 'Mathematics - Offline Workshop', instructor: 'Dr. Alok P.', time: 'At Center - 09:00 AM', youtubeUrl: '', type: 'live', modality: 'offline' },
-  { id: '5', title: 'Physics - Lab Session', instructor: 'Mr. Pankaj S.', time: 'Floor 2, Lab B - 11:30 AM', youtubeUrl: '', type: 'live', modality: 'offline' },
-];
+interface ClassesScreenProps {
+    user: User;
+    onAddClass: () => void; // Assuming a function to add a new class
+}
 
-const ClassesScreen: React.FC<{ user: User }> = () => {
+const ClassesScreen: React.FC<ClassesScreenProps> = ({ user, onAddClass }) => {
   const [modality, setModality] = useState<'online' | 'offline'>('online');
+  const [classes, setClasses] = useState<ClassSession[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredClasses = MOCK_CLASSES.filter(c => c.modality === modality);
+  useEffect(() => {
+    if (!user) return;
+    setLoading(true);
+    
+    const q = user.role === UserRole.ADMIN 
+      ? collection(db, 'classes')
+      : query(collection(db, 'classes'), where('batchId', '==', user.studentId || ''));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const classList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ClassSession));
+      setClasses(classList);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching classes: ", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const filteredClasses = classes.filter(c => c.modality === modality);
 
   return (
     <div className="p-4 space-y-4">
+        <div className="flex items-center justify-between mb-2">
+            <div>
+                <h2 className="text-xl font-bold text-gray-800">Available Classes</h2>
+                <p className="text-sm text-gray-500">Your scheduled classes are listed below</p>
+            </div>
+            {user.role === UserRole.ADMIN && (
+                <button 
+                    onClick={onAddClass} 
+                    className="bg-blue-600 text-white rounded-xl w-10 h-10 flex items-center justify-center shadow-lg shadow-blue-200/50 active:scale-95 transition-all"
+                >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v12m6-6H6" /></svg>
+                </button>
+            )}
+        </div>
       {/* Toggle Segmented Control */}
-      <div className="bg-gray-100 p-1.5 rounded-2xl flex items-center mb-2">
+      <div className="bg-gray-100 p-1.5 rounded-2xl flex items-center">
         <button 
           onClick={() => setModality('online')}
           className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
@@ -53,7 +88,11 @@ const ClassesScreen: React.FC<{ user: User }> = () => {
       </div>
 
       <div className="space-y-3">
-        {filteredClasses.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-10">
+            <p className="text-gray-400 font-bold text-sm">Loading classes...</p>
+          </div>
+        ) : filteredClasses.length > 0 ? (
           filteredClasses.map(cls => (
             <div key={cls.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
