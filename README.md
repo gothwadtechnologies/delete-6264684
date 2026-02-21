@@ -1,4 +1,4 @@
-# Run and deploy your AI Studio app
+# How To Run This ClassesX Application on Broswer
 
 This contains everything you need to run your app locally.
 
