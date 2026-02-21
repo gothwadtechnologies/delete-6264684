@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { GraduationCap, Users, ShieldCheck, ChevronRight, Settings, Info } from 'lucide-react';
 import { UserRole, GlobalSettings } from '../types';
-import { APP_NAME, BRANDING_FOOTER } from '../constants';
+import { BRANDING_FOOTER } from '../constants';
 
 interface RoleSelectionScreenProps {
   onSelectRole: (role: UserRole) => void;
@@ -9,94 +11,143 @@ interface RoleSelectionScreenProps {
 }
 
 const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onSelectRole, settings }) => {
-  const [isInfoMenuOpen, setIsInfoMenuOpen] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
 
   const roles = [
-    { id: UserRole.STUDENT, title: 'Student', icon: '👨‍🎓', desc: 'Access your learning portal' },
-    { id: UserRole.PARENT, title: 'Parent', icon: '👪', desc: "View your child's progress" },
+    { 
+      id: UserRole.STUDENT, 
+      title: 'Student', 
+      icon: <GraduationCap className="w-7 h-7" />, 
+      desc: 'Access your classes, tests & results', 
+      color: 'bg-blue-600',
+      lightColor: 'bg-blue-50',
+      textColor: 'text-blue-600'
+    },
+    { 
+      id: UserRole.PARENT, 
+      title: 'Parent', 
+      icon: <Users className="w-7 h-7" />, 
+      desc: 'Track attendance, fees & progress', 
+      color: 'bg-emerald-600',
+      lightColor: 'bg-emerald-50',
+      textColor: 'text-emerald-600'
+    }
   ];
 
-  const handleAdminLoginClick = () => {
-    onSelectRole(UserRole.ADMIN);
-    setIsInfoMenuOpen(false);
+  const adminRole = { 
+    id: UserRole.ADMIN, 
+    title: 'Administrator', 
+    icon: <ShieldCheck className="w-7 h-7" />, 
+    desc: 'Manage batches, staff & students', 
+    color: 'bg-slate-800',
+    lightColor: 'bg-slate-100',
+    textColor: 'text-slate-800'
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 15, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
   };
 
   return (
-    <div className="font-sans bg-gray-50 flex flex-col h-full">
-      
-      <header className="px-4 py-3 border-b border-gray-200 flex items-center justify-between relative shrink-0">
-        <button className="p-2 rounded-full hover:bg-gray-200 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.096 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+    <div className="flex-1 bg-white flex flex-col h-full overflow-hidden font-sans">
+      {/* Android Style Header */}
+      <header className="px-4 pt-4 pb-2 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors text-slate-600">
+          <Settings className="w-5 h-5" />
         </button>
-        <div className="text-center">
-          <h1 className="text-lg font-bold text-gray-900">Classes X</h1>
-          <p className="text-[10px] font-medium text-gray-500">Gothwad Technologies</p>
+        
+        <div className="flex flex-col items-center">
+          <span className="text-xs font-black tracking-[0.2em] text-blue-600 uppercase">
+            {settings.appName}
+          </span>
+          <div className="h-0.5 w-4 bg-blue-600 rounded-full mt-0.5" />
         </div>
+
         <div className="relative">
           <button 
-            onClick={() => setIsInfoMenuOpen(prev => !prev)} 
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition-colors"
+            onClick={() => setShowAdmin(!showAdmin)}
+            className={`w-10 h-10 flex items-center justify-center rounded-full transition-all ${showAdmin ? 'bg-blue-50 text-blue-600' : 'hover:bg-slate-100 text-slate-600'}`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <Info className="w-5 h-5" />
           </button>
-          {isInfoMenuOpen && (
-            <div 
-              className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-20 py-1 animate-in fade-in zoom-in-95"
-              onMouseLeave={() => setIsInfoMenuOpen(false)}
-            >
-              <button 
-                onClick={handleAdminLoginClick} 
-                className="w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+
+          <AnimatePresence>
+            {showAdmin && (
+              <motion.button
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                onClick={() => onSelectRole(UserRole.ADMIN)}
+                className="absolute right-0 mt-2 whitespace-nowrap bg-sky-100 text-sky-700 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider shadow-xl shadow-sky-200/50 border border-sky-200 active:scale-95 transition-all z-[60]"
               >
                 Administrator Login
-              </button>
-            </div>
-          )}
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
       </header>
 
-      <main className="overflow-y-auto flex-grow">
-        <div className="p-6 space-y-5">
-          <div className="pt-4 text-left">
-            <h2 className="text-2xl font-bold text-gray-900">Select Your Role</h2>
-            <p className="text-sm text-gray-500 mt-1">Please choose how you'd like to sign in.</p>
-          </div>
+      <div className="flex-1 px-6 pt-6 overflow-y-auto scroll-hide">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">Welcome back</h2>
+          <p className="text-slate-500 text-sm font-medium mt-1">Choose your account type to sign in</p>
+        </motion.div>
 
-          <div className="space-y-4 pt-2">
-            {roles.map((role) => (
-              <button
-                key={role.id}
-                onClick={() => onSelectRole(role.id)}
-                className="w-full bg-white border border-gray-200 shadow-sm rounded-2xl p-4 flex items-center gap-4 transition-all duration-200 active:scale-[0.98] hover:border-blue-500 hover:shadow-md"
-              >
-                <div className={`w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-2xl shrink-0`}>
-                  {role.icon}
-                </div>
-                <div className="flex-1 text-left">
-                  <h3 className="font-bold text-base text-gray-800">{role.title}</h3>
-                  <p className="text-sm text-gray-500">{role.desc}</p>
-                </div>
-                <div className="text-gray-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              </button>
-            ))}
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-4"
+        >
+          {roles.map((role) => (
+            <motion.button
+              key={role.id}
+              variants={itemVariants}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => onSelectRole(role.id)}
+              className="w-full bg-slate-50 border border-slate-100 rounded-3xl p-5 flex items-center gap-4 transition-all hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 group"
+            >
+              <div className={`w-14 h-14 rounded-2xl ${role.lightColor} ${role.textColor} flex items-center justify-center shadow-sm shrink-0`}>
+                {role.icon}
+              </div>
+              <div className="flex-1 text-left">
+                <h3 className="font-bold text-lg text-slate-900 leading-tight">{role.title}</h3>
+                <p className="text-slate-500 text-[11px] mt-0.5 font-medium leading-relaxed">{role.desc}</p>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-blue-600 group-hover:border-blue-100 transition-colors">
+                <ChevronRight className="w-4 h-4" />
+              </div>
+            </motion.button>
+          ))}
+        </motion.div>
+      </div>
+
+      <footer className="p-8 flex flex-col items-center shrink-0 bg-white border-t border-slate-50">
+        <div className="flex flex-col items-center gap-1">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] flex items-center gap-2">
+            {BRANDING_FOOTER}
+          </p>
+          <div className="flex items-center gap-2 mt-2">
+            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+            <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">System Online</span>
           </div>
         </div>
-      </main>
-
-      {/* Footer with updated black background badge */}
-      <footer className="p-5 text-center shrink-0">
-        <span className="inline-block bg-gray-900 text-gray-100 text-[10px] font-bold tracking-widest uppercase px-4 py-2 rounded-full">
-        © 2026 {BRANDING_FOOTER}
-        </span>
       </footer>
     </div>
   );
