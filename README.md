@@ -1,10 +1,8 @@
-# This Application is a Asset of Gothwad Technologies
-# Developed By - Pawan Gothwad as Individual
-# App ID and Copyrights - n29slbxdn4wrc89nx39wc4w54v6
-# App Server Copyrights - dn967253dn90
-# Pakage ID - nb87n542cvn72n8722c5
-# How To Run This ClassesX Application on Broswer
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
+# Run and deploy your AI Studio app
 
 This contains everything you need to run your app locally.
 
