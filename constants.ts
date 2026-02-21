@@ -4,11 +4,11 @@ export const BRANDING_FOOTER = "GOTHWAD TECHNOLOGIES";
 export const SPLASH_DURATION = 3000;
 
 export const THEME = {
-  primary: '#2563eb', // Blue 600
-  secondary: '#f8fafc',
-  accent: '#e11d48', // Red
-  text: '#1e293b',
-  textLight: '#64748b'
+  primary: '#3b82f6', // Brighter Blue for Dark Mode
+  secondary: '#0f172a',
+  accent: '#f43f5e', // Rose 500
+  text: '#f8fafc',
+  textLight: '#94a3b8'
 };
 
-export const BOOK_ICON = "📖"; // Changed to Open Book as requested
+export const BOOK_ICON = "📖";

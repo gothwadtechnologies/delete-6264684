@@ -12,6 +12,8 @@ export interface User {
   phone: string;
   email?: string;
   studentId?: string;
+  fatherName?: string;
+  batchIds?: string[];
 }
 
 export interface GlobalSettings {
@@ -22,13 +24,7 @@ export interface GlobalSettings {
   underMaintenance?: boolean;
 }
 
-export enum ClassLevel {
-  NINTH = '9th',
-  TENTH = '10th',
-  ELEVENTH = '11th',
-  TWELFTH = '12th',
-  DROPPER = 'Dropper'
-}
+export type ClassLevel = '9th' | '10th' | '11th' | '12th' | 'Dropper';
 
 export interface Batch {
   id: string;
@@ -117,4 +113,4 @@ export interface AttendanceRecord {
 }
 
 export type ScreenName = 'LOADING' | 'ROLE_SELECTION' | 'LOGIN' | 'HOME' | 'PROFILE' | 'SETTINGS' | 'ADMIN_MANAGE' | 'BATCH_DETAILS' | 'NOTIFICATIONS' | 'MAINTENANCE';
-export type TabName = 'Batches' | 'Classes' | 'Tests' | 'Fees' | 'Attendance';
+export type TabName = 'Batches' | 'Classes' | 'Students' | 'Tests' | 'Fees' | 'Attendance';

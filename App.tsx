@@ -8,19 +8,18 @@ import SettingsScreen from './screens/SettingsScreen.tsx';
 import BatchDetailsScreen from './screens/BatchDetailsScreen.tsx';
 import NotificationsScreen from './screens/NotificationsScreen.tsx';
 import ProfileScreen from './screens/ProfileScreen.tsx';
-import MainTabNavigator from './navigation/MainTabNavigator.tsx';
-import DrawerMenu from './components/DrawerMenu.tsx';
+import AdminNavigator from './navigation/AdminNavigator.tsx';
+import UserNavigator from './navigation/UserNavigator.tsx';
+import AdminDrawer from './components/AdminDrawer.tsx';
+import UserDrawer from './components/UserDrawer.tsx';
 import { auth, db, isFirebaseAvailable } from './firebase.ts';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc, onSnapshot, collection, query, orderBy, onSnapshot as onBatchesSnapshot } from 'firebase/firestore';
-import GlobalAddStudentScreen from './screens/GlobalAddStudentScreen.tsx';
-import UniversalSearchScreen from './screens/UniversalSearchScreen.tsx';
-import CreateBatchScreen from './screens/CreateBatchScreen.tsx';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 
 const FIXED_SETTINGS: GlobalSettings = {
   appName: "CLASSES X",
   logoEmoji: "X",
-  primaryColor: "#2563eb",
+  primaryColor: "#3b82f6",
   backgroundColor: "#ffffff",
   underMaintenance: false
 };
@@ -35,11 +34,6 @@ export default function App() {
   const [isDemoMode, setIsDemoMode] = useState(!isFirebaseAvailable);
   const [activeResource, setActiveResource] = useState<string | null>(null);
   const [settingsSubView, setSettingsSubView] = useState<'MAIN' | 'ABOUT' | 'AI' | 'PRIVACY'>('MAIN');
-  const [isAddStudentScreenVisible, setIsAddStudentScreenVisible] = useState(false);
-  const [isCreateBatchScreenVisible, setIsCreateBatchScreenVisible] = useState(false);
-  const [isSearchScreenVisible, setIsSearchScreenVisible] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [allBatches, setAllBatches] = useState<Batch[]>([]);
 
   useEffect(() => {
     if (!isFirebaseAvailable) {
@@ -60,12 +54,6 @@ export default function App() {
             underMaintenance: !!data.underMaintenance
           });
         }
-      });
-
-      const batchesQuery = query(collection(db, 'batches'), orderBy('createdAt', 'desc'));
-      onBatchesSnapshot(batchesQuery, (snapshot) => {
-        const fetchedBatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Batch[];
-        setAllBatches(fetchedBatches);
       });
     }
 
@@ -130,16 +118,16 @@ export default function App() {
     setIsDrawerOpen(false);
     setActiveResource(null);
   };
-  
+
   if (currentScreen === 'MAINTENANCE') {
     return (
       <div className="mobile-container bg-white flex flex-col items-center justify-center p-8 text-center">
         <div className="w-24 h-24 bg-rose-600 rounded-[2.5rem] flex items-center justify-center text-5xl mb-10 shadow-xl text-white">🚧</div>
-        <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tighter">System Offline</h2>
+        <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">System Offline</h2>
         <div className="bg-rose-50 p-6 rounded-[2rem] border border-rose-100 mt-8">
-          <p className="text-rose-800 text-xs font-black uppercase tracking-[0.2em] leading-relaxed">Maintenance In Progress</p>
+          <p className="text-rose-600 text-xs font-black uppercase tracking-[0.2em] leading-relaxed">Maintenance In Progress</p>
         </div>
-        <button onClick={handleLogout} className="mt-14 bg-gray-900 text-white px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl active:scale-95 transition-all">Logout Session</button>
+        <button onClick={handleLogout} className="mt-14 bg-slate-900 text-white px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl active:scale-95 transition-all">Logout Session</button>
       </div>
     );
   }
@@ -152,75 +140,75 @@ export default function App() {
       
       {currentScreen === 'HOME' && user && (
         <>
-          <MainTabNavigator 
-            settings={settings} 
-            user={user} 
-            forcedResource={activeResource} 
-            onOpenDrawer={() => setIsDrawerOpen(true)} 
-            onSelectBatch={(b) => { setSelectedBatch(b); setCurrentScreen('BATCH_DETAILS'); }} 
-            onOpenNotifications={() => setCurrentScreen('NOTIFICATIONS')}
-            onOpenProfile={() => setCurrentScreen('PROFILE')} 
-            onLogout={handleLogout}
-            onTabPress={() => setActiveResource(null)}
-            onSelectResource={(id) => setActiveResource(id)}
-            onAddStudent={() => setIsAddStudentScreenVisible(true)}
-            onAddBatch={() => setIsCreateBatchScreenVisible(true)}
-            onSearch={() => setIsSearchScreenVisible(true)}
-          />
-          <DrawerMenu 
-            isOpen={isDrawerOpen} 
-            onClose={() => setIsDrawerOpen(false)} 
-            user={user} 
-            onLogout={handleLogout} 
-            onSettings={(view) => { 
-              setSettingsSubView(view || 'MAIN');
-              setCurrentScreen('SETTINGS'); 
-              setIsDrawerOpen(false); 
-            }} 
-            onProfile={() => { setCurrentScreen('PROFILE'); setIsDrawerOpen(false); }}
-            onSelectResource={(id) => {
-              setActiveResource(id);
-              setIsDrawerOpen(false);
-            }}
-          />
-        </> 
+          {user.role === UserRole.ADMIN ? (
+            <AdminNavigator 
+              settings={settings} 
+              user={user} 
+              forcedResource={activeResource} 
+              onOpenDrawer={() => setIsDrawerOpen(true)} 
+              onSelectBatch={(b) => { setSelectedBatch(b); setCurrentScreen('BATCH_DETAILS'); }} 
+              onOpenNotifications={() => setCurrentScreen('NOTIFICATIONS')} 
+              onOpenProfile={() => setCurrentScreen('PROFILE')} 
+              onLogout={handleLogout}
+              onTabPress={() => setActiveResource(null)}
+              onSelectResource={(id) => setActiveResource(id)}
+            />
+          ) : (
+            <UserNavigator 
+              settings={settings} 
+              user={user} 
+              forcedResource={activeResource} 
+              onOpenDrawer={() => setIsDrawerOpen(true)} 
+              onSelectBatch={(b) => { setSelectedBatch(b); setCurrentScreen('BATCH_DETAILS'); }} 
+              onOpenNotifications={() => setCurrentScreen('NOTIFICATIONS')} 
+              onOpenProfile={() => setCurrentScreen('PROFILE')} 
+              onLogout={handleLogout}
+              onTabPress={() => setActiveResource(null)}
+              onSelectResource={(id) => setActiveResource(id)}
+            />
+          )}
+          {user.role === UserRole.ADMIN ? (
+            <AdminDrawer 
+              isOpen={isDrawerOpen} 
+              onClose={() => setIsDrawerOpen(false)} 
+              user={user} 
+              onLogout={handleLogout} 
+              onSettings={(view) => { 
+                setSettingsSubView(view || 'MAIN');
+                setCurrentScreen('SETTINGS'); 
+                setIsDrawerOpen(false); 
+              }} 
+              onProfile={() => { setCurrentScreen('PROFILE'); setIsDrawerOpen(false); }}
+              onSelectResource={(id) => {
+                setActiveResource(id);
+                setIsDrawerOpen(false);
+              }}
+            />
+          ) : (
+            <UserDrawer 
+              isOpen={isDrawerOpen} 
+              onClose={() => setIsDrawerOpen(false)} 
+              user={user} 
+              onLogout={handleLogout} 
+              onSettings={(view) => { 
+                setSettingsSubView(view || 'MAIN');
+                setCurrentScreen('SETTINGS'); 
+                setIsDrawerOpen(false); 
+              }} 
+              onProfile={() => { setCurrentScreen('PROFILE'); setIsDrawerOpen(false); }}
+              onSelectResource={(id) => {
+                setActiveResource(id);
+                setIsDrawerOpen(false);
+              }}
+            />
+          )}
+        </>
       )}
 
       {currentScreen === 'SETTINGS' && user && <SettingsScreen settings={settings} user={user} onBack={() => { setCurrentScreen('HOME'); setSettingsSubView('MAIN'); }} initialSubView={settingsSubView} />}
       {currentScreen === 'BATCH_DETAILS' && user && selectedBatch && <BatchDetailsScreen batch={selectedBatch} settings={settings} user={user} onBack={() => setCurrentScreen('HOME')} />}
       {currentScreen === 'NOTIFICATIONS' && user && <NotificationsScreen user={user} settings={settings} onBack={() => setCurrentScreen('HOME')} />}
       {currentScreen === 'PROFILE' && user && <ProfileScreen user={user} settings={settings} onBack={() => setCurrentScreen('HOME')} onUpdateUser={(upd) => setUser({...user, ...upd})} />}
-      
-      {isAddStudentScreenVisible && (
-        <GlobalAddStudentScreen 
-          allBatches={allBatches}
-          onClose={() => setIsAddStudentScreenVisible(false)}
-        />
-      )}
-
-      {isSearchScreenVisible && (
-        <UniversalSearchScreen 
-          searchQuery={searchQuery}
-          onClose={() => setIsSearchScreenVisible(false)}
-          onSelectBatch={(batch) => {
-            setSelectedBatch(batch);
-            setCurrentScreen('BATCH_DETAILS');
-            setIsSearchScreenVisible(false);
-          }}
-          onSelectStudent={(student) => {
-            // You might want to navigate to a student details screen here
-            console.log("Selected student:", student);
-            setIsSearchScreenVisible(false);
-          }}
-        />
-      )}
-
-      {isCreateBatchScreenVisible && user && (
-        <CreateBatchScreen 
-          userId={user.uid}
-          onClose={() => setIsCreateBatchScreenVisible(false)}
-        />
-      )}
     </div>
   );
 }
