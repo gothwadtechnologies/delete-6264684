@@ -5,6 +5,9 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
+      // YAHAN PAR APNE REPO KA NAAM DAALIYE 👇
+      base: '/delete-6264684/', 
+      
       server: {
         port: 3000,
         host: '0.0.0.0',
